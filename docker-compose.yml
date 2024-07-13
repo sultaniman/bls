@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16.2
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    ports:
+      # expose postgres into host
+      - "127.0.0.1:5432:5432"
+
+  adminer:
+    image: adminer:4.8.1
+    restart: always
+    ports:
+      - 8181:8080
+    environment:
+      ADMINER_DESIGN: 'nette'
+
+  open-webui:
+    network_mode: host
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      - WEBUI_AUTH=False
+      - OLLAMA_BASE_URL=http://127.0.0.1:11434
+    container_name: open-webui
+    restart: always
+    image: ghcr.io/open-webui/open-webui:main
+
+volumes:
+  # for persistence between restarts
+  postgres_data: {}
+  postgis_data: {}
+  open-webui:
+    external: true
+    name: open-webui
